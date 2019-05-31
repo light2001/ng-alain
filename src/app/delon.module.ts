@@ -1,232 +1,91 @@
 /**
  * 进一步对基础模块的导入提炼
- * 有关模块注册指导原则请参考：https://github.com/cipchk/ng-alain/issues/180
+ * 有关模块注册指导原则请参考：https://github.com/ng-alain/ng-alain/issues/180
  */
 import { NgModule, Optional, SkipSelf, ModuleWithProviders } from '@angular/core';
-import { throwIfAlreadyLoaded } from '@core/module-import-guard';
+import { throwIfAlreadyLoaded } from '@core';
 
-// region: zorro modules
-
-import {
-    // LoggerModule,
-    // NzLocaleModule,
-    NzButtonModule,
-    NzAlertModule,
-    NzBadgeModule,
-    // NzCalendarModule,
-    NzCascaderModule,
-    NzCheckboxModule,
-    NzDatePickerModule,
-    NzFormModule,
-    NzInputModule,
-    NzInputNumberModule,
-    NzGridModule,
-    NzMessageModule,
-    NzModalModule,
-    NzNotificationModule,
-    NzPaginationModule,
-    NzPopconfirmModule,
-    NzPopoverModule,
-    NzRadioModule,
-    NzRateModule,
-    NzSelectModule,
-    NzSpinModule,
-    NzSliderModule,
-    NzSwitchModule,
-    NzProgressModule,
-    NzTableModule,
-    NzTabsModule,
-    NzTagModule,
-    NzTimePickerModule,
-    NzUtilModule,
-    NzStepsModule,
-    NzDropDownModule,
-    NzMenuModule,
-    NzBreadCrumbModule,
-    NzLayoutModule,
-    NzRootModule,
-    NzCarouselModule,
-    // NzCardModule,
-    NzCollapseModule,
-    NzTimelineModule,
-    NzToolTipModule,
-    // NzBackTopModule,
-    // NzAffixModule,
-    // NzAnchorModule,
-    NzAvatarModule,
-    NzUploadModule,
-    // SERVICES
-    NzNotificationService,
-    NzMessageService
-} from 'ng-zorro-antd';
-export const ZORROMODULES = [
-    // LoggerModule,
-    // NzLocaleModule,
-    NzButtonModule,
-    NzAlertModule,
-    NzBadgeModule,
-    // NzCalendarModule,
-    NzCascaderModule,
-    NzCheckboxModule,
-    NzDatePickerModule,
-    NzFormModule,
-    NzInputModule,
-    NzInputNumberModule,
-    NzGridModule,
-    NzMessageModule,
-    NzModalModule,
-    NzNotificationModule,
-    NzPaginationModule,
-    NzPopconfirmModule,
-    NzPopoverModule,
-    NzRadioModule,
-    NzRateModule,
-    NzSelectModule,
-    NzSpinModule,
-    NzSliderModule,
-    NzSwitchModule,
-    NzProgressModule,
-    NzTableModule,
-    NzTabsModule,
-    NzTagModule,
-    NzTimePickerModule,
-    NzUtilModule,
-    NzStepsModule,
-    NzDropDownModule,
-    NzMenuModule,
-    NzBreadCrumbModule,
-    NzLayoutModule,
-    NzRootModule,
-    NzCarouselModule,
-    // NzCardModule,
-    NzCollapseModule,
-    NzTimelineModule,
-    NzToolTipModule,
-    // NzBackTopModule,
-    // NzAffixModule,
-    // NzAnchorModule,
-    NzAvatarModule,
-    NzUploadModule
-];
-// endregion
-
-// region: @delon/abc modules
-import {
-    AdSimpleTableModule,
-    AdReuseTabModule,
-    AdAvatarListModule,
-    AdChartsModule,
-    AdCountDownModule,
-    AdDescListModule,
-    AdEllipsisModule,
-    AdErrorCollectModule,
-    AdExceptionModule,
-    AdFooterToolbarModule,
-    AdGlobalFooterModule,
-    AdNoticeIconModule,
-    AdNumberInfoModule,
-    AdProHeaderModule,
-    AdResultModule,
-    AdSidebarNavModule,
-    AdStandardFormRowModule,
-    AdTagSelectModule,
-    AdTrendModule,
-    AdDownFileModule,
-    AdImageModule,
-    AdUtilsModule,
-    AdFullContentModule,
-    AdXlsxModule,
-    AdZipModule
-} from '@delon/abc';
-export const ABCMODULES = [
-    AdSimpleTableModule,
-    AdReuseTabModule,
-    AdAvatarListModule,
-    AdChartsModule,
-    AdCountDownModule,
-    AdDescListModule,
-    AdEllipsisModule,
-    AdErrorCollectModule,
-    AdExceptionModule,
-    AdFooterToolbarModule,
-    AdGlobalFooterModule,
-    AdNoticeIconModule,
-    AdNumberInfoModule,
-    AdProHeaderModule,
-    AdResultModule,
-    AdSidebarNavModule,
-    AdStandardFormRowModule,
-    AdTagSelectModule,
-    AdTrendModule,
-    AdDownFileModule,
-    AdImageModule,
-    AdUtilsModule,
-    AdFullContentModule,
-    AdXlsxModule,
-    AdZipModule
-];
-// endregion
-
-import { NgZorroAntdModule } from 'ng-zorro-antd';
-import { NgZorroAntdExtraModule } from 'ng-zorro-antd-extra';
 import { AlainThemeModule } from '@delon/theme';
-import { AlainABCModule } from '@delon/abc';
-import { AlainAuthModule } from '@delon/auth';
-import { AlainACLModule } from '@delon/acl';
-import { DelonCacheModule } from '@delon/cache';
-// mock
+
+// #region mock
 import { DelonMockModule } from '@delon/mock';
 import * as MOCKDATA from '../../_mock';
 import { environment } from '@env/environment';
-const MOCKMODULE = !environment.production || environment.chore === true ?
-                    [ DelonMockModule.forRoot({ data: MOCKDATA }) ] : [];
+const MOCK_MODULES = !environment.production ? [DelonMockModule.forRoot({ data: MOCKDATA })] : [];
+// #endregion
 
-// region: global config functions
+// #region reuse-tab
+/**
+ * 若需要[路由复用](https://ng-alain.com/components/reuse-tab)需要：
+ * 1、增加 `REUSETAB_PROVIDES`
+ * 2、在 `src/app/layout/default/default.component.html` 修改：
+ *  ```html
+ *  <section class="alain-default__content">
+ *    <reuse-tab></reuse-tab>
+ *    <router-outlet></router-outlet>
+ *  </section>
+ *  ```
+ */
+import { RouteReuseStrategy } from '@angular/router';
+import { ReuseTabService, ReuseTabStrategy } from '@delon/abc/reuse-tab';
+const REUSETAB_PROVIDES = [
+  // {
+  //   provide: RouteReuseStrategy,
+  //   useClass: ReuseTabStrategy,
+  //   deps: [ReuseTabService],
+  // },
+];
+// #endregion
 
-// import { SimpleTableConfig } from '@delon/abc';
-// export function simpleTableConfig(): SimpleTableConfig {
-//     return { ps: 20 };
-// }
+// #region global config functions
 
-// endregion
+import { PageHeaderConfig } from '@delon/abc';
+export function fnPageHeaderConfig(): PageHeaderConfig {
+  return {
+    ...new PageHeaderConfig(),
+    ...({ homeI18n: 'home' } as PageHeaderConfig),
+  };
+}
+
+import { DelonAuthConfig } from '@delon/auth';
+export function fnDelonAuthConfig(): DelonAuthConfig {
+  return {
+    ...new DelonAuthConfig(),
+    ...({ login_url: '/passport/login' } as DelonAuthConfig),
+  };
+}
+
+import { STConfig } from '@delon/abc';
+export function fnSTConfig(): STConfig {
+  return {
+    ...new STConfig(),
+    ...({
+      modal: { size: 'lg' },
+    } as STConfig),
+  };
+}
+
+const GLOBAL_CONFIG_PROVIDES = [
+  // TIPS：@delon/abc 有大量的全局配置信息，例如设置所有 `st` 的页码默认为 `20` 行
+  { provide: STConfig, useFactory: fnSTConfig },
+  { provide: PageHeaderConfig, useFactory: fnPageHeaderConfig },
+  { provide: DelonAuthConfig, useFactory: fnDelonAuthConfig },
+];
+
+// #endregion
 
 @NgModule({
-    imports: [
-        NgZorroAntdModule.forRoot(),
-        NgZorroAntdExtraModule.forRoot(),
-        // theme
-        AlainThemeModule.forRoot(),
-        // abc
-        AdErrorCollectModule.forRoot(), AdFooterToolbarModule.forRoot(), AdSidebarNavModule.forRoot(), AdDownFileModule.forRoot(), AdImageModule.forRoot(),
-        AdAvatarListModule.forRoot(), AdDescListModule.forRoot(), AdEllipsisModule.forRoot(), AdExceptionModule.forRoot(), AdExceptionModule.forRoot(),
-        AdNoticeIconModule.forRoot(), AdNumberInfoModule.forRoot(), AdProHeaderModule.forRoot(), AdResultModule.forRoot(), AdStandardFormRowModule.forRoot(),
-        AdTagSelectModule.forRoot(), AdTrendModule.forRoot(), AdUtilsModule.forRoot(), AdChartsModule.forRoot(), AdCountDownModule.forRoot(), AdSimpleTableModule.forRoot(),
-        AdReuseTabModule.forRoot(), AdFullContentModule.forRoot(), AdXlsxModule.forRoot(), AdZipModule.forRoot(),
-        // auth
-        AlainAuthModule.forRoot({
-            // ignores: [ `\\/login`, `assets\\/` ],
-            login_url: `/passport/login`
-        }),
-        // acl
-        AlainACLModule.forRoot(),
-        // cache
-        DelonCacheModule.forRoot(),
-        // mock
-        ...MOCKMODULE
-    ]
+  imports: [AlainThemeModule.forRoot(), ...MOCK_MODULES],
 })
 export class DelonModule {
-  constructor( @Optional() @SkipSelf() parentModule: DelonModule) {
+  constructor(@Optional() @SkipSelf() parentModule: DelonModule) {
     throwIfAlreadyLoaded(parentModule, 'DelonModule');
   }
 
   static forRoot(): ModuleWithProviders {
-      return {
-          ngModule: DelonModule,
-          providers: [
-              // TIPS：@delon/abc 有大量的全局配置信息，例如设置所有 `simple-table` 的页码默认为 `20` 行
-              // { provide: SimpleTableConfig, useFactory: simpleTableConfig }
-          ]
-      };
+    return {
+      ngModule: DelonModule,
+      providers: [...REUSETAB_PROVIDES, ...GLOBAL_CONFIG_PROVIDES],
+    };
   }
 }
